@@ -1,73 +1,108 @@
-# SegarRasa Enterprise Core (SR-Core ERP)
-## PT Segar Rasa Riau — Sistem ERP Distribusi F&B Mandiri
+# SegarRasa ERP — Starter Project
 
-**Sesuai Dokumen Spesifikasi Resmi:** `24SI3 - Group 01 - Food and Beverage.pdf`  
-**Merek Usaha:** PT Segar Rasa Riau (*SegarRasa*)  
-**Bidang Industri:** Distributor Minuman Siap Minum & Camilan Kemasan Non-Mewah  
-**Wilayah Operasional:** Pekanbaru, Kampar, Siak, Dumai (Riau)  
-**Mata Uang:** Rupiah (IDR)  
-**Skema Perpajakan:** PPN Efektif 11% (Formula PMK: 12% × 11/12)
+Aplikasi web ERP mandiri untuk studi kasus **PT Segar Rasa Riau**, dengan pola navigasi desktop yang terinspirasi workflow ERP/Odoo 17. Ini bukan Odoo dan tidak menggunakan source code/aset Odoo.
 
----
+## Stack
+- Python 3.11+
+- Flask 3
+- SQLite (database lokal persisten)
+- HTML, CSS, Vanilla JavaScript
+- Session authentication + role-based authorization (RBAC)
 
-## 1. Panduan Menjalankan Aplikasi Secara Lokal
+## Menjalankan di VS Code
+1. Extract ZIP, lalu buka folder `segarrasa_erp_starter` di VS Code.
+2. Buat virtual environment:
+   ```bash
+   python -m venv .venv
+   ```
+3. Aktifkan:
+   - Windows PowerShell: `.venv\\Scripts\\Activate.ps1`
+   - macOS/Linux: `source .venv/bin/activate`
+4. Install dependency:
+   ```bash
+   pip install -r requirements.txt
+   ```
+5. Salin `.env.example` menjadi `.env` (ubah `SECRET_KEY` untuk penggunaan nyata).
+6. Jalankan:
+   ```bash
+   python run.py
+   ```
+7. Buka `http://127.0.0.1:5000`.
 
-### Prasyarat:
-- Web browser modern (Google Chrome, Edge, Safari, Firefox).
-- Node.js versi 18+ (Sudah terpasang di direktori alat pendukung scratch).
+Database SQLite dibuat otomatis di `instance/segarrasa_erp.db` dan baseline seed dimuat pada pertama kali.
 
-### Perintah Menjalankan:
-```bash
-# Masuk ke direktori proyek
-cd C:\Users\User\.gemini\antigravity\scratch\segar-rasa-erp
+## Akun demo
+| Role | Username | Password |
+|---|---|---|
+| Owner | `owner` | `owner123` |
+| Sales | `sales` | `sales123` |
+| Warehouse | `warehouse` | `warehouse123` |
+| Procurement | `procurement` | `procurement123` |
+| Finance | `finance` | `finance123` |
+| Quality | `quality` | `quality123` |
 
-# Menjalankan preview production server (atau npm run dev)
-npm run preview -- --host 0.0.0.0 --port 5173
+Ganti password dan secret sebelum deployment publik. Akun ini hanya kredensial demo.
+
+## Modul / cakupan starter
+- Home / Dashboard, Contacts, Products, CRM, Sales Orders, Purchase Orders, Inventory, Delivery, Receipt & Quality, Customer Invoices, Vendor Bills, Payments, Internal Transfers, Returns, Accounting, Audit Log.
+- Seed master: 6 customer, 4 vendor, 15 SKU, 2 warehouse.
+- Seed baseline: stock 749 units, reservation S00004 10 units, PO00003, CRM00009, opening AR/AP/Bank/Inventory and opening journal.
+- RBAC enforced at API layer; UI menu visibility is not the security boundary.
+- Document sequences and audit events.
+- Tax simulation effective 11% (12% x 11/12), half-up per line.
+- Stock reservation uses On Hand - Reserved.
+- Sales invoice quantity capped by validated delivered quantity not yet invoiced.
+- Receipt accepted quantity only increases sellable stock.
+- Vendor bill created from accepted receipt quantity.
+- Partial payments reject zero/over-residual amounts.
+- PO above Rp1,000,000 subtotal enters Pending Approval for Owner.
+- Posting endpoints include basic idempotency protection.
+
+## Catatan penting / batas implementasi
+Project ini adalah **starter scaffold yang bisa dijalankan**, bukan pengganti ERP production-ready atau bukti bahwa T-01 sampai T-36 telah lulus. Sebelum dinilai, tim harus:
+1. Menyelesaikan seluruh layar S-01–S-18 dan seluruh alur UI (sebagian operasi tersedia melalui API).
+2. Menambah edit/cancel/revision controls, document smart links, full line editor, access matrix per permission, and comprehensive audit.
+3. Memastikan credit exposure, partial delivery/backorder, returns, VAT rounding, vendor three-way match, and accounting entries against every fixture in the PDF.
+4. Menulis dan menjalankan Test Results T-01–T-36 dengan expected, actual, pass/fail, screenshots, defect log.
+5. Menambah concurrency-safe stock locking, database migrations, CSRF protection, password change/reset, rate limiting, backups, and production deployment configuration.
+6. Run security review and accounting reconciliation before public deployment.
+
+### Known simplifications to review
+- UI is a compact scaffold; some actions (delivery, invoice posting, receipt validation, payment, return) currently use the JSON API and need forms/buttons in the UI.
+- Purchase approval threshold and VAT rate are stored in settings; confirm fixture thresholds and edge cases against all pages of the handout.
+- Current return logic is a simplified baseline and needs stronger delivered/invoiced/return traceability and credit-note journal generation.
+- Credit exposure and multi-document reservation should be reviewed for all corner cases, especially partial invoicing.
+- Accounting module provides journal records and a trial-balance endpoint; implement complete journal validation and every debit/credit posting path before claiming accounting completeness.
+- Add a `user_roles` pivot if multi-role users are needed; current assignment is one role per user.
+- Use HTTPS, secure cookie settings, proper secrets, and a managed database for public hosting.
+
+## Useful API examples
+All endpoints are under `/api`. Login first with `/api/login`.
+- `GET /api/dashboard`
+- `GET /api/masters/customers`, `/products`, `/vendors`
+- `GET /api/stock`
+- `POST /api/sales-orders` then `POST /api/sales-orders/<id>/confirm`
+- `POST /api/sales-orders/<id>/delivery` then `POST /api/deliveries/<id>/validate`
+- `POST /api/invoices/from-order/<id>` then `POST /api/invoices/<id>/post`
+- `POST /api/purchase-orders` then `/confirm`
+- `POST /api/purchase-orders/<id>/receipt`, `/api/receipts/<id>/validate`
+- `POST /api/vendor-bills/from-receipt/<id>`, `/api/vendor-bills/<id>/post`
+- `POST /api/payments`, `POST /api/transfers`, `POST /api/returns`
+- `GET /api/accounting/trial-balance`, `GET /api/reports`
+- `POST /api/seed/reset` (Owner only; destructive reset)
+
+## Project structure
+```text
+app/
+  __init__.py
+  auth.py
+  db.py
+  routes.py
+  templates/index.html
+  static/style.css
+  static/app.js
+tests/
+docs/
+run.py
+requirements.txt
 ```
-Akses di browser Anda pada alamat:
-👉 **`http://localhost:5173/`**
-
----
-
-## 2. Akun Demo untuk 6 Peran (Simulasi RBAC)
-
-Aplikasi dilengkapi fitur 1-klik instan switch role pada halaman Login maupun Navbar atas:
-
-| Role | Nama Pengguna | Email Login | Password | Tanggung Jawab & Hak Akses |
-|---|---|---|---|---|
-| **Owner** | Ratna Putri | `owner@segarrasa.id` | `owner123` | **MELIHAT SELURUH ERP (18 Layar & 7 Modul)**. Approval PO > Rp1 Jt & Diskon > 10%. |
-| **Sales** | Dimas Saputra | `sales@segarrasa.id` | `sales123` | CRM, Kontak Customer, Katalog Produk, Quotation & Sales Order. (Dilarang akses Akuntansi: T-02). |
-| **Warehouse** | Yusuf Hidayat | `warehouse@segarrasa.id` | `wh123` | Ketersediaan Stok Fisik, Reservasi (Available = On Hand - Reserved), Delivery Order, Penerimaan Gudang, Transfer Internal. |
-| **Procurement** | Nina Febriana | `procurement@segarrasa.id` | `proc123` | Master Vendor, RFQ, Purchase Order (PO > Rp1 Jt butuh approval Owner: SR-20). |
-| **Finance** | Sari Permata | `finance@segarrasa.id` | `fin123` | Customer Invoice (Berbasis Delivered Qty: SR-02), Tagihan Vendor (3-Way Match: SR-06), Buku Besar Jurnal Berpasangan, Pembayaran Parsial. |
-| **Quality** | Tika Maharani | `quality@segarrasa.id` | `qa123` | Pemeriksaan Kualitas Masuk (QC Inbound Pass/Fail). Isolasi kemasan rusak; unit gagal tidak masuk stok jual (SR-11). |
-
----
-
-## 3. Cakupan Lengkap 18 Layar (S-01 s.d. S-18)
-
-1. **S-01:** Beranda App Switcher (F-01) — Home launcher & ringkasan operasional.
-2. **S-02:** Contact Customer (F-02) — Master customer, credit limit, AR berjalan, dan headroom.
-3. **S-03:** Product Variant Catalog (F-03) — 15 master SKU unik dengan harga jual & standard cost terpisah.
-4. **S-04:** CRM Pipeline (F-04) — Pipeline prospek (New → Qualified → Won) & konversi Quotation.
-5. **S-05:** Quotation / Sales Order (F-05, F-06) — Pesanan penjualan, PPN 11%, gerbang approval diskon > 10%, dan penguncian saat Confirmed.
-6. **S-06:** Reservation & Credit Gate (F-07, F-10) — Formula alokasi $Available = On Hand - Reserved$, pencegahan stok negatif & limit kredit.
-7. **S-07:** Delivery Order & Backorder (F-08) — Pengiriman parsial, pembentukan backorder otomatis, & jurnal COGS.
-8. **S-08:** Customer Invoice (F-09, F-21) — Penagihan hanya atas kuantitas terkirim (*Delivered Qty*).
-9. **S-09:** RFQ / Purchase Order (F-11, F-22) — Pembelian vendor & gerbang approval Owner untuk subtotal > Rp1.000.000.
-10. **S-10:** Receipt & Accepted Qty (F-12) — Penerimaan fisik gudang terintegrasi hasil QC masuk.
-11. **S-11:** Quality Check Pass / Fail (F-13) — Evaluasi segel/kemasan rusak; unit ditolak diisolasi.
-12. **S-12:** Vendor Bill & Three-way Match (F-14) — Rekonsiliasi PO vs Receipt vs Bill. Penahanan varians jika tagihan > accepted.
-13. **S-13:** Journal Entries & General Ledger (F-15) — Jurnal berpasangan otomatis berimbang sempurna (Dr = Cr, selisih Rp0).
-14. **S-14:** Register Payment Dialog (F-16) — Penerimaan kas/bank, pembayaran parsial, & pelacakan residual.
-15. **S-15:** Internal Stock Transfer (F-17) — Pemindahan stok WH-PKU ke OUT-MRP tanpa mengubah nilai konsolidasi.
-16. **S-16:** Return & Credit Note (F-18) — Retur pelanggan layak jual, pemulihan stok, pembalikan COGS, & Nota Kredit.
-17. **S-17:** KPI Dashboard (F-19) — Rekonsiliasi terpadu metrik baseline (On Hand 749, Reserved 10, Available 739, Valuasi Rp6.314.000).
-18. **S-18:** Audit Log & Document Relations (F-20) — Peta relasi dokumen bisnis & jejak audit aktor idempoten.
-
----
-
-## 4. Modal Verifikator 36 Skenario Pengujian (T-01 s.d. T-36)
-
-Aplikasi memiliki fitur khusus **"36 Uji Skenario (T-01 s.d. T-36)"** di bilah navigasi atas (tombol warna emas).  
-Dosen atau evaluator dapat mengklik tombol ini kapan saja untuk menjalankan pengujian otomatis atas seluruh aturan bisnis normal flow dan rule/edge test dengan perbandingan *Expected vs Actual Result* dan bukti verifikasi teknis.
