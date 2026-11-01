@@ -141,6 +141,15 @@ CREATE TABLE IF NOT EXISTS leads (
 CREATE TABLE IF NOT EXISTS settings (
  key TEXT PRIMARY KEY, value TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS reorder_points (
+    sku TEXT NOT NULL,
+    warehouse_code TEXT NOT NULL,
+    min_available INTEGER NOT NULL CHECK(min_available >= 0),
+    PRIMARY KEY (sku, warehouse_code),
+    FOREIGN KEY (sku, warehouse_code)
+        REFERENCES stock(sku, warehouse_code)
+);
 """
 
 def get_db():
@@ -227,8 +236,12 @@ def seed_db():
       ("OUT-MRP","Outlet Marpoyan","Pekanbaru")
     ])
     stock_rows = [
-      ("BVG-250-LEM",50,0),("BVG-250-PCH",28,6),("BVG-500-LEM",32,8),
-      ("BVG-500-PCH",24,6),("TEA-350-ORI",60,18),("TEA-350-LYC",48,12),
+      ("BVG-250-LEM", 50, 12),
+      ("BVG-250-PCH", 32, 8),
+      ("BVG-500-LEM", 30, 10),
+      ("BVG-500-PCH", 28, 6),
+      ("TEA-350-ORI", 60, 18),
+      ("TEA-350-LYC", 48, 12),
       ("COF-250-LAT",26,8),("COF-250-MOC",24,5),("WTR-600-PLN",100,20),
       ("WTR-1500-PLN",45,10),("SNK-060-BBQ",42,14),("SNK-060-SEA",35,9),
       ("SNK-120-BBQ",22,6),("NUT-080-HNY",20,5),("BIS-090-CHO",34,10)
@@ -251,6 +264,9 @@ def seed_db():
     db.execute("INSERT INTO settings(key,value) VALUES('large_po_threshold','1000000')")
     # Opening journal
     db.execute("INSERT INTO journal_entries(number,source_type,source_id,status) VALUES('MISC00001','Opening',0,'Posted')")
+    db.execute(
+    "INSERT OR IGNORE INTO sequences(key, value) VALUES('MISC', 1)"
+    )
     jid = db.execute("SELECT id FROM journal_entries WHERE number='MISC00001'").fetchone()["id"]
     for acct, dr, cr in [("1010",7000000,0),("1100",1050000,0),("1200",6314000,0),("2100",0,220000),("3100",0,14144000)]:
         db.execute("INSERT INTO journal_lines(journal_id,account_code,debit,credit) VALUES(?,?,?,?)",(jid,acct,dr,cr))

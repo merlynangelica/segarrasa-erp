@@ -112,7 +112,13 @@ def confirm_so(oid):
     if so["discount_pct"]>10 and session["user"]["role"]!="Owner":
         return jsonify({"error":"Diskon di atas 10% memerlukan approval Owner"}),409
     ar=db.execute("SELECT COALESCE(SUM(opening_ar),0) n FROM customers WHERE code=?",(so["customer_code"],)).fetchone()["n"]
-    ar+=db.execute("SELECT COALESCE(SUM(total-paid_amount),0) n FROM invoices i JOIN sales_orders s ON s.id=i.order_id WHERE s.customer_code=? AND i.status='Posted'",(so["customer_code"],)).fetchone()["n"]
+    ar += db.execute("""
+        SELECT COALESCE(SUM(i.total - i.paid_amount), 0) AS n
+        FROM invoices i
+        JOIN sales_orders s ON s.id = i.order_id
+        WHERE s.customer_code = ?
+          AND i.status = 'Posted'
+    """, (so["customer_code"],)).fetchone()["n"]
     uninvoiced=db.execute("""SELECT COALESCE(SUM(so.total-COALESCE(inv.invoiced,0)),0) n FROM sales_orders so
       LEFT JOIN (SELECT order_id,SUM(total) invoiced FROM invoices WHERE status='Posted' GROUP BY order_id) inv ON inv.order_id=so.id
       WHERE so.customer_code=? AND so.status='Confirmed'""",(so["customer_code"],)).fetchone()["n"]
@@ -377,9 +383,739 @@ def reset_seed():
     # Owner-only destructive reset; rebuilds the baseline fixture.
     if session.get("user",{}).get("role")!="Owner":return jsonify({"error":"Owner only"}),403
     db=get_db()
-    for t in ["journal_lines","journal_entries","returns","transfers","payments","vendor_bills","invoice_lines","invoices","receipt_lines","receipts","purchase_order_lines","purchase_orders","delivery_lines","deliveries","sales_order_lines","sales_orders","reservations","leads","audit_logs","stock","products","vendors","customers","warehouses","sequences","settings","users"]:
+    for t in ["journal_lines","journal_entries","returns","transfers","payments","vendor_bills","invoice_lines","invoices","receipt_lines","receipts","purchase_order_lines","purchase_orders","delivery_lines","deliveries","sales_order_lines","sales_orders","reservations","leads","audit_logs","reorder_points","stock","products","vendors","customers","warehouses","sequences","settings","users"]:
         db.execute(f"DELETE FROM {t}")
     db.commit()
     from .db import seed_db
     seed_db()
     return ok({"message":"Baseline reset berhasil"})
+
+
+@bp.get("/products/analysis")
+@require("products.view")
+def product_analysis():
+    db = get_db()
+
+    # Minimum stok bersifat opsional untuk percobaan
+    raw_minimum = request.args.get("minimum")
+    minimum = None
+
+    if raw_minimum is not None:
+        try:
+            minimum = int(raw_minimum)
+            if minimum < 0:
+                raise ValueError()
+        except ValueError:
+            return jsonify({
+                "error": "Minimum stok harus angka 0 atau lebih"
+            }), 400
+
+    # Ambil data produk dan stok dari database
+    rows = db.execute("""
+        SELECT
+            p.sku,
+            p.name,
+            p.size,
+            p.unit,
+            p.sales_price,
+            p.standard_cost,
+            s.warehouse_code,
+            s.on_hand,
+            rp.min_available,
+            COALESCE((
+                SELECT SUM(r.quantity)
+                FROM reservations r
+                WHERE r.sku = s.sku
+                  AND r.warehouse_code = s.warehouse_code
+                  AND r.active = 1
+            ), 0) AS reserved
+        FROM products p
+        JOIN stock s ON s.sku = p.sku
+        LEFT JOIN reorder_points rp
+        ON rp.sku = s.sku
+        AND rp.warehouse_code = s.warehouse_code
+        WHERE p.active = 1
+        ORDER BY p.sku, s.warehouse_code
+    """).fetchall()
+
+    results = []
+
+    for row in rows:
+        product = dict(row)
+
+        # Hitung stok yang tersedia
+        product["available"] = (
+            product["on_hand"] - product["reserved"]
+        )
+
+        # Hitung nilai persediaan
+        product["stock_value"] = (
+            product["on_hand"] * product["standard_cost"]
+        )
+
+        # Hitung potensi margin kotor per unit
+        product["margin_per_unit"] = (
+            product["sales_price"] - product["standard_cost"]
+        )
+
+        # Tentukan status stok
+        if product["min_available"] is None:
+            product["stock_status"] = "Belum diatur"
+        elif product["available"] <= product["min_available"]:
+            product["stock_status"] = "Stok menipis"
+        else:
+            product["stock_status"] = "Normal"
+
+        results.append(product)
+
+    return ok(results)
+
+
+@bp.post("/products/reorder-point")
+@require("products.configure")
+def save_reorder_point():
+    data = request.get_json(silent=True) or {}
+
+    if not isinstance(data, dict):
+        return jsonify({
+            "error": "Format data tidak valid"
+        }), 400
+
+    sku = str(data.get("sku") or "").strip()
+    warehouse = str(data.get("warehouse_code") or "").strip()
+    minimum = data.get("min_available")
+
+    # Validasi input
+    if not sku or not warehouse:
+        return jsonify({
+            "error": "SKU dan gudang wajib diisi"
+        }), 400
+
+    if type(minimum) is not int or minimum < 0:
+        return jsonify({
+            "error": "Minimum stok harus bilangan bulat >= 0"
+        }), 400
+
+    db = get_db()
+
+    # Pastikan produk dan gudang tersedia
+    stock = db.execute("""
+        SELECT 1 FROM stock
+        WHERE sku = ? AND warehouse_code = ?
+    """, (sku, warehouse)).fetchone()
+
+    if not stock:
+        return jsonify({
+            "error": "Produk atau gudang tidak ditemukan"
+        }), 404
+
+    # Simpan atau perbarui minimum stok
+    db.execute("""
+        INSERT INTO reorder_points
+            (sku, warehouse_code, min_available)
+        VALUES (?, ?, ?)
+        ON CONFLICT(sku, warehouse_code)
+        DO UPDATE SET
+            min_available = excluded.min_available
+    """, (sku, warehouse, minimum))
+
+    # Simpan riwayat perubahan
+    audit(
+        user(),
+        "Set Minimum Stock",
+        f"{sku}/{warehouse}",
+        f"Minimum available: {minimum}"
+    )
+
+    db.commit()
+
+    return ok({
+        "sku": sku,
+        "warehouse_code": warehouse,
+        "min_available": minimum
+    })
+
+
+@bp.get("/products/performance")
+@require("products.view")
+def products_performance():
+    db = get_db()
+
+    # Periode analisis: default 30 hari
+    try:
+        days = int(request.args.get("days", "30"))
+    except (TypeError, ValueError):
+        return jsonify({
+            "error": "Periode harus berupa angka"
+        }), 400
+
+    if days < 1 or days > 365:
+        return jsonify({
+            "error": "Periode harus 1 sampai 365 hari"
+        }), 400
+
+    # 1. Ambil seluruh produk aktif
+    products = db.execute("""
+        SELECT
+            sku,
+            name,
+            size,
+            unit,
+            sales_price,
+            standard_cost
+        FROM products
+        WHERE active = 1
+        ORDER BY sku
+    """).fetchall()
+
+    # 2. Ambil stok dan minimum stok per gudang
+    stock_rows = db.execute("""
+        SELECT
+            s.sku,
+            s.warehouse_code,
+            s.on_hand,
+            rp.min_available,
+            COALESCE((
+                SELECT SUM(r.quantity)
+                FROM reservations r
+                WHERE r.sku = s.sku
+                  AND r.warehouse_code = s.warehouse_code
+                  AND r.active = 1
+            ), 0) AS reserved
+        FROM stock s
+        LEFT JOIN reorder_points rp
+            ON rp.sku = s.sku
+           AND rp.warehouse_code = s.warehouse_code
+    """).fetchall()
+
+    stock_by_sku = {}
+
+    for row in stock_rows:
+        stock_by_sku.setdefault(
+            row["sku"], []
+        ).append(dict(row))
+
+    # 3. Hitung produk terkirim pada periode
+    # Hanya Delivery berstatus Done
+    delivery_rows = db.execute("""
+        SELECT
+            dl.sku,
+            SUM(dl.quantity) AS total_sold,
+            COUNT(DISTINCT d.id) AS delivery_count
+        FROM delivery_lines dl
+        JOIN deliveries d
+            ON d.id = dl.delivery_id
+        WHERE d.status = 'Done'
+          AND d.validated_at IS NOT NULL
+          AND datetime(d.validated_at) >= datetime('now', ?)
+        GROUP BY dl.sku
+    """, (f"-{days} days",)).fetchall()
+
+    sales_by_sku = {
+        row["sku"]: dict(row)
+        for row in delivery_rows
+    }
+
+    total_delivered = sum(
+        row["total_sold"] for row in delivery_rows
+    )
+
+    # 4. Hitung pendapatan dari Invoice Posted
+    # SO Confirmed belum dianggap revenue
+    invoice_rows = db.execute("""
+        SELECT
+            il.sku,
+            SUM(il.quantity) AS invoiced_qty,
+            SUM(il.net_amount) AS net_sales
+        FROM invoice_lines il
+        JOIN invoices i
+            ON i.id = il.invoice_id
+        WHERE i.status = 'Posted'
+        GROUP BY il.sku
+    """).fetchall()
+
+    invoice_by_sku = {
+        row["sku"]: dict(row)
+        for row in invoice_rows
+    }
+
+    # 5. Retur dicatat terpisah untuk evaluasi
+    return_rows = db.execute("""
+        SELECT
+            sku,
+            SUM(quantity) AS returned_qty
+        FROM returns
+        WHERE status = 'Done'
+        GROUP BY sku
+    """).fetchall()
+
+    returns_by_sku = {
+        row["sku"]: row["returned_qty"]
+        for row in return_rows
+    }
+
+    results = []
+
+    for p in products:
+        sku = p["sku"]
+        locations = stock_by_sku.get(sku, [])
+
+        # Jumlah stok seluruh lokasi
+        on_hand = sum(
+            r["on_hand"] for r in locations
+        )
+
+        reserved = sum(
+            r["reserved"] for r in locations
+        )
+
+        available = on_hand - reserved
+
+        # Penjualan berdasarkan Delivery Done
+        sales = sales_by_sku.get(sku, {})
+
+        total_sold = sales.get("total_sold", 0)
+        delivery_count = sales.get("delivery_count", 0)
+
+        # Nilai inventory
+        stock_value = (
+            on_hand * p["standard_cost"]
+        )
+
+        # Margin potensial per unit
+        margin_per_unit = (
+            p["sales_price"] - p["standard_cost"]
+        )
+
+        # Keuntungan berdasarkan Posted Invoice
+        invoice = invoice_by_sku.get(sku)
+
+        if invoice is None:
+            net_sales = None
+            estimated_cogs = None
+            gross_profit = None
+            profit_margin = None
+        else:
+            net_sales = invoice["net_sales"]
+
+            estimated_cogs = (
+                invoice["invoiced_qty"]
+                * p["standard_cost"]
+            )
+
+            gross_profit = (
+                net_sales - estimated_cogs
+            )
+
+            profit_margin = (
+                round(gross_profit / net_sales * 100, 2)
+                if net_sales > 0 else None
+            )
+
+        # Cek lokasi dengan stok menipis
+        low_stock_locations = []
+        configured_locations = 0
+
+        for r in locations:
+            minimum = r["min_available"]
+
+            if minimum is None:
+                continue
+
+            configured_locations += 1
+
+            location_available = (
+                r["on_hand"] - r["reserved"]
+            )
+
+            if location_available <= minimum:
+                low_stock_locations.append(
+                    r["warehouse_code"]
+                )
+
+        # Klasifikasi pergerakan produk
+        if total_delivered == 0:
+            movement_status = "Data belum cukup"
+        elif total_sold == 0:
+            movement_status = "0 terkirim - perlu evaluasi"
+        else:
+            movement_status = "Ada pengiriman"
+
+        # Rekomendasi untuk Finance
+        if configured_locations == 0:
+            recommendation = (
+                "Minimum stok belum diatur"
+            )
+
+        elif low_stock_locations and total_sold > 0:
+            recommendation = (
+                "Pertimbangkan restock"
+            )
+
+        elif low_stock_locations:
+            recommendation = (
+                "Stok menipis - evaluasi kebutuhan"
+            )
+
+        else:
+            recommendation = (
+                "Stok cukup pada lokasi terkonfigurasi"
+            )
+
+        results.append({
+            "sku": sku,
+            "product": (
+                f'{p["name"]} {p["size"] or ""}'
+            ).strip(),
+
+            "on_hand": on_hand,
+            "reserved": reserved,
+            "available": available,
+            "stock_value": stock_value,
+
+            "total_sold_period": total_sold,
+            "delivery_count": delivery_count,
+            "movement_status": movement_status,
+
+            "margin_per_unit": margin_per_unit,
+
+            "posted_net_sales": net_sales,
+            "estimated_cogs": estimated_cogs,
+            "estimated_gross_profit": gross_profit,
+            "estimated_profit_margin_pct": profit_margin,
+
+            "returned_qty": returns_by_sku.get(sku, 0),
+
+            "low_stock_locations": (
+                ", ".join(low_stock_locations)
+                if low_stock_locations else "—"
+            ),
+
+            "restock_recommendation": recommendation
+        })
+
+    # 6. Ranking produk paling banyak terkirim
+    best_sellers = sorted(
+        [
+            x for x in results
+            if x["total_sold_period"] > 0
+        ],
+        key=lambda x: (
+            -x["total_sold_period"], x["sku"]
+        )
+    )[:5]
+
+    # 7. Produk dengan pengiriman paling rendah
+    # Tidak otomatis berarti produk tidak laku
+    if total_delivered > 0:
+        low_movement = sorted(
+            results,
+            key=lambda x: (
+                x["total_sold_period"], x["sku"]
+            )
+        )[:5]
+    else:
+        low_movement = []
+
+    # 8. Produk yang perlu ditinjau untuk restock
+    restock_candidates = [
+        x for x in results
+        if x["restock_recommendation"]
+        == "Pertimbangkan restock"
+    ]
+
+    return ok({
+        "period_days": days,
+        "has_delivery_history": total_delivered > 0,
+        "total_delivered_units": total_delivered,
+        "best_sellers": best_sellers,
+        "low_movement_products": low_movement,
+        "restock_candidates": restock_candidates,
+        "products": results,
+        "note": (
+            "Produk terlaris dihitung dari Delivery Done. "
+            "Keuntungan adalah estimasi berdasarkan "
+            "Invoice Posted dan standard cost saat ini. "
+            "Retur ditampilkan terpisah dan belum "
+            "dikurangkan dari profit karena posting "
+            "Credit Note belum lengkap."
+        )
+    })
+
+
+@bp.get("/contacts/profitability")
+@require("contacts.view")
+def contacts_profitability():
+    db = get_db()
+
+    # Ambil semua customer aktif
+    customers = db.execute("""
+        SELECT code, name, opening_ar, credit_limit
+        FROM customers
+        WHERE active = 1
+        ORDER BY code
+    """).fetchall()
+
+    # Penjualan hanya dari Invoice Posted
+    # Dipisah dari retur supaya tidak double counting
+    invoice_rows = db.execute("""
+        SELECT
+            so.customer_code AS customer_code,
+            SUM(il.net_amount) AS invoiced_net_sales,
+            SUM(
+                il.quantity * p.standard_cost
+            ) AS estimated_cogs
+        FROM invoices i
+        JOIN sales_orders so
+            ON so.id = i.order_id
+        JOIN invoice_lines il
+            ON il.invoice_id = i.id
+        JOIN products p
+            ON p.sku = il.sku
+        WHERE i.status = 'Posted'
+        GROUP BY so.customer_code
+    """).fetchall()
+
+    invoice_by_customer = {
+        r["customer_code"]: dict(r)
+        for r in invoice_rows
+    }
+
+    # Piutang dari Invoice Posted yang belum lunas
+    ar_rows = db.execute("""
+        SELECT
+            so.customer_code AS customer_code,
+            COUNT(*) AS posted_invoice_count,
+            SUM(
+                i.total - i.paid_amount
+            ) AS unpaid_invoice_ar
+        FROM invoices i
+        JOIN sales_orders so
+            ON so.id = i.order_id
+        WHERE i.status = 'Posted'
+        GROUP BY so.customer_code
+    """).fetchall()
+
+    ar_by_customer = {
+        r["customer_code"]: dict(r)
+        for r in ar_rows
+    }
+
+    # Retur yang sudah Done
+    return_rows = db.execute("""
+        SELECT
+            so.customer_code AS customer_code,
+            r.quantity,
+            r.credit_total,
+            p.standard_cost
+        FROM returns r
+        JOIN invoices i
+            ON i.id = r.invoice_id
+        JOIN sales_orders so
+            ON so.id = i.order_id
+        JOIN products p
+            ON p.sku = r.sku
+        WHERE r.status = 'Done'
+          AND i.status = 'Posted'
+    """).fetchall()
+
+    tax_setting = db.execute("""
+        SELECT value
+        FROM settings
+        WHERE key = 'tax_effective_rate'
+    """).fetchone()
+
+    tax_rate = (
+        float(tax_setting["value"])
+        if tax_setting else 0.11
+    )
+
+    returns_by_customer = {}
+
+    for r in return_rows:
+        ret = returns_by_customer.setdefault(
+            r["customer_code"],
+            {
+                "returned_units": 0,
+                "returned_net_est": 0,
+                "returned_cost_est": 0,
+                "credit_note_gross": 0
+            }
+        )
+
+        ret["returned_units"] += r["quantity"]
+
+        # credit_total sudah termasuk pajak
+        ret["returned_net_est"] += money(
+            r["credit_total"] / (1 + tax_rate)
+        )
+
+        ret["returned_cost_est"] += (
+            r["quantity"] * r["standard_cost"]
+        )
+
+        ret["credit_note_gross"] += r["credit_total"]
+
+    results = []
+
+    for c in customers:
+        code = c["code"]
+
+        invoice = invoice_by_customer.get(code)
+        ar = ar_by_customer.get(code, {})
+        ret = returns_by_customer.get(code, {})
+
+        opening_ar = c["opening_ar"]
+
+        unpaid_invoice_ar = ar.get(
+            "unpaid_invoice_ar", 0
+        )
+
+        outstanding_ar = (
+            opening_ar + unpaid_invoice_ar
+        )
+
+        # Jangan mengarang keuntungan jika
+        # belum ada Invoice Posted
+        if invoice is None:
+            net_sales = None
+            estimated_cogs = None
+            gross_profit = None
+            profit_margin_pct = None
+
+            profit_status = (
+                "Belum ada Invoice Posted"
+            )
+
+        else:
+            # Penjualan bersih setelah retur
+            net_sales = (
+                invoice["invoiced_net_sales"]
+                - ret.get("returned_net_est", 0)
+            )
+
+            # Estimasi COGS setelah retur
+            estimated_cogs = (
+                invoice["estimated_cogs"]
+                - ret.get("returned_cost_est", 0)
+            )
+
+            gross_profit = (
+                net_sales - estimated_cogs
+            )
+
+            profit_margin_pct = (
+                round(
+                    gross_profit / net_sales * 100,
+                    2
+                )
+                if net_sales > 0 else None
+            )
+
+            if gross_profit > 0:
+                profit_status = "Untung (estimasi)"
+
+            elif gross_profit < 0:
+                profit_status = "Rugi (estimasi)"
+
+            else:
+                profit_status = "Impas (estimasi)"
+
+        results.append({
+            "customer_code": code,
+            "customer_name": c["name"],
+
+            "posted_invoice_count": ar.get(
+                "posted_invoice_count", 0
+            ),
+
+            "net_sales": net_sales,
+            "estimated_cogs": estimated_cogs,
+            "estimated_gross_profit": gross_profit,
+            "estimated_margin_pct": profit_margin_pct,
+            "profit_status": profit_status,
+
+            "opening_ar": opening_ar,
+            "unpaid_invoice_ar": unpaid_invoice_ar,
+            "outstanding_ar": outstanding_ar,
+            "credit_limit": c["credit_limit"],
+
+            "returned_units": ret.get(
+                "returned_units", 0
+            ),
+
+            "credit_note_gross": ret.get(
+                "credit_note_gross", 0
+            )
+        })
+
+    # Ranking customer paling menguntungkan
+    profitable = sorted(
+        [
+            r for r in results
+            if r["estimated_gross_profit"] is not None
+            and r["estimated_gross_profit"] > 0
+        ],
+        key=lambda r: (
+            -r["estimated_gross_profit"],
+            r["customer_code"]
+        )
+    )
+
+    # Customer dengan estimasi laba negatif
+    losses = sorted(
+        [
+            r for r in results
+            if r["estimated_gross_profit"] is not None
+            and r["estimated_gross_profit"] < 0
+        ],
+        key=lambda r: (
+            r["estimated_gross_profit"],
+            r["customer_code"]
+        )
+    )
+
+    customers_with_data = sum(
+        r["posted_invoice_count"] > 0
+        for r in results
+    )
+
+    return ok({
+        "summary": {
+            "customer_count": len(results),
+
+            "customers_with_posted_invoice":
+                customers_with_data,
+
+            "customers_without_posted_invoice":
+                len(results) - customers_with_data,
+
+            "total_outstanding_ar": sum(
+                r["outstanding_ar"]
+                for r in results
+            ),
+
+            "total_estimated_gross_profit": (
+                sum(
+                    r["estimated_gross_profit"] or 0
+                    for r in results
+                )
+                if customers_with_data else None
+            )
+        },
+
+        "most_profitable": profitable[:5],
+        "loss_making": losses,
+        "customers": results,
+
+        "note": (
+            "Profit merupakan ESTIMASI kumulatif "
+            "dari Invoice Posted dikurangi Return Done. "
+            "COGS menggunakan standard cost saat ini, "
+            "bukan biaya historis. "
+            "Piutang = opening AR + sisa Invoice Posted. "
+            "Retur belum otomatis mengurangi AR "
+            "dalam starter ERP ini. "
+            "Opening AR tidak dihitung sebagai laba."
+        )
+    })
