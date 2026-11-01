@@ -4,9 +4,9 @@ from flask import session, jsonify
 PERMISSIONS = {
  "Owner": {"*"},
  "Sales": {"dashboard.view","crm.view","crm.create","sales.view","sales.create","sales.confirm","contacts.view","products.view","delivery.view"},
- "Warehouse": {"dashboard.view","contacts.view","inventory.view","delivery.view","delivery.validate","transfer.view","transfer.create","transfer.validate","receipt.view"},
- "Procurement": {"dashboard.view","contacts.view","purchase.view","purchase.create","purchase.confirm","receipt.view"},
- "Quality": {"dashboard.view","contacts.view","receipt.view","quality.view","quality.check"},
+ "Warehouse": {"dashboard.view","contacts.view","products.view","inventory.view","delivery.view","delivery.validate","transfer.view","transfer.create","transfer.validate","receipt.view"},
+ "Procurement": {"dashboard.view","contacts.view","products.view","purchase.view","purchase.create","purchase.confirm","receipt.view"},
+ "Quality": {"dashboard.view","contacts.view","products.view","receipt.view","quality.view","quality.check"},
  "Finance": {"dashboard.view","contacts.view","products.view","invoicing.view","invoicing.post","bills.view","bills.post","payments.view","payments.create","accounting.view","accounting.post","reports.view","returns.view","returns.validate"},
 }
 def allowed(permission):
