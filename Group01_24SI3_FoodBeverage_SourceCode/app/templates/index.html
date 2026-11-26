@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SegarRasa ERP</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2746%27 fill=%27%23f4c430%27/%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2734%27 fill=%27%23fff3a6%27/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/style.css?v={{ v }}">
+</head>
+<body>
+  <div id="login" class="login-shell">
+    <section class="login-hero" aria-label="SegarRasa ERP">
+      <div class="hero-stage" aria-hidden="true">
+        <div class="lemon3d big" data-size="300"></div>
+        <div class="lemon3d mid" data-size="140"></div>
+        <div class="lemon3d tiny" data-size="80"></div>
+        <span class="drop d1"></span><span class="drop d2"></span><span class="drop d3"></span>
+      </div>
+      <svg class="hero-leaf leaf-float" viewBox="0 0 100 60" aria-hidden="true"><path d="M5 55 C25 5 75 0 95 5 C85 40 45 60 5 55 Z" fill="#2e7d4f"/><path d="M5 55 C35 35 60 20 95 5" stroke="#9ccb3b" stroke-width="3" fill="none"/></svg>
+      <div class="hero-brand"><span class="brand-mark small">SR</span>SegarRasa ERP</div>
+      <div>
+        <h2>Segar dari Riau, tercatat rapi.</h2>
+        <p>Penjualan, pembelian, gudang, quality control dan keuangan PT Segar Rasa Riau dalam satu sistem.</p>
+        <div class="hero-chips"><span>Sparkling Lemon</span><span>Teh Melati</span><span>Biskuit</span><span>WH Pekanbaru</span><span>Outlet Marpoyan</span></div>
+      </div>
+      <div class="hero-foot">PT Segar Rasa Riau · Enterprise Resource Planning</div>
+    </section>
+    <div class="login-side">
+      <div class="login-card">
+        <p class="eyebrow">PT SEGAR RASA RIAU</p>
+        <h1>Masuk ke akun Anda</h1>
+        <p class="muted">Gunakan username dan password yang diberikan Master Admin.</p>
+        <form id="loginForm" autocomplete="on">
+          <label for="lgUser">Username</label><input id="lgUser" name="username" required autocomplete="username" placeholder="username">
+          <label for="lgPass">Password</label>
+          <div class="pw-wrap"><input id="lgPass" name="password" type="password" required autocomplete="current-password" placeholder="••••••••"><button type="button" id="pwToggle" aria-label="Tampilkan password">Lihat</button></div>
+          <button class="primary">Masuk</button>
+        </form>
+        <div id="loginError" class="error" role="alert"></div>
+        <small class="login-note">Lupa password? Hubungi Master Admin perusahaan.</small>
+      </div>
+    </div>
+  </div>
+
+  <div id="app" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark small">SR</span><div><b>SegarRasa</b><small>ERP Workspace</small></div></div>
+      <div class="company-switch">PT Segar Rasa Riau <span>IDR</span></div>
+      <div class="nav-label" id="navLabel">MENU</div>
+      <nav id="nav"></nav>
+      <div class="sidebar-bottom"><small>PT Segar Rasa Riau · Segar dari Riau</small><button id="logout">↪ Sign out</button></div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div class="crumbs"><button class="apps-btn" id="appsBtn" title="Apps">▦ Apps</button><span class="crumb" id="crumb"></span></div>
+        <div class="user-area">
+          <span class="avatar" id="userAvatar" aria-hidden="true"></span><span id="userName"></span><span class="role-pill" id="userRole"></span>
+          <span class="muted">· PT Segar Rasa Riau</span>
+          <button id="logoutTop" class="btn" title="Sign out">↪ Sign out</button>
+        </div>
+      </header>
+      <section class="content">
+        <div class="page-heading">
+          <div><h1 id="heading">Home</h1><p id="subheading"></p></div>
+          <div id="actions" class="toolbar"></div>
+        </div>
+        <div id="notice"></div>
+        <div id="pageContent"></div>
+      </section>
+    </main>
+  </div>
+  <script src="/static/app.js?v={{ v }}"></script>
+</body>
+</html>

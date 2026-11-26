@@ -1,0 +1,876 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+
+:root {
+    /* Tema "Segar Rasa": daun hijau segar + kuning lemon di atas krem hangat */
+    --ink: #1e2b22;
+    --muted: #6e7768;
+    --line: #ece6d2;
+    --bg: #fffbf0;
+    --purple: #2e7d4f;   /* warna utama (daun) — nama variabel dipertahankan agar CSS lama tetap jalan */
+    --purple2: #e8f4ea;
+    --lemon: #f4c430;
+    --lemon2: #fff5cc;
+    --lemon-ink: #6b5300;
+    --lime: #9ccb3b;
+    --green: #15966b;
+    --red: #c44c4c
+}
+
+* {
+    box-sizing: border-box
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 14px 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif
+}
+
+.hidden {
+    display: none !important
+}
+
+.login-shell {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #f7f5fc, #f4f6f8)
+}
+
+.login-card {
+    width: min(420px, 92vw);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 38px;
+    box-shadow: 0 18px 60px #1b1d2410
+}
+
+.brand-mark {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    background: var(--purple);
+    color: white;
+    display: grid;
+    place-items: center;
+    font: 800 18px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    margin-bottom: 20px
+}
+
+.brand-mark.small {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    font-size: 13px;
+    margin: 0
+}
+
+.eyebrow {
+    font-size: 10px;
+    letter-spacing: 1.6px;
+    color: var(--purple);
+    font-weight: 700
+}
+
+.login-card h1 {
+    font: 800 28px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    margin: 6px 0
+}
+
+.muted,
+small {
+    color: var(--muted)
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin: 18px 0 7px
+}
+
+input,
+select {
+    width: 100%;
+    border: 1px solid #e3dcc4;
+    border-radius: 8px;
+    padding: 11px 12px;
+    font: inherit;
+    background: #fff
+}
+
+button {
+    font: inherit;
+    cursor: pointer;
+    border: 0
+}
+
+.primary {
+    background: var(--purple);
+    color: #fff;
+    border-radius: 8px;
+    padding: 11px 17px;
+    font-weight: 700
+}
+
+.login-card .primary {
+    width: 100%;
+    margin: 22px 0 12px
+}
+
+.error {
+    color: var(--red);
+    margin-top: 10px
+}
+
+.app-shell {
+    display: flex;
+    min-height: 100vh
+}
+
+.sidebar {
+    width: 244px;
+    background: #fff;
+    border-right: 1px solid var(--line);
+    padding: 18px 13px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 3px 8px 20px
+}
+
+.brand b {
+    display: block;
+    font: 800 15px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif
+}
+
+.brand small {
+    font-size: 10px
+}
+
+.company-switch {
+    border: 1px solid var(--line);
+    padding: 11px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-bottom: 22px;
+    font-size: 12px
+}
+
+.company-switch span {
+    float: right;
+    color: var(--muted)
+}
+
+.nav-label {
+    font-size: 10px;
+    letter-spacing: 1.3px;
+    color: #a1a8b1;
+    font-weight: 700;
+    padding: 0 11px 9px
+}
+
+.sidebar nav {
+    display: grid;
+    gap: 3px
+}
+
+.sidebar nav button {
+    background: transparent;
+    text-align: left;
+    color: #59616d;
+    padding: 10px 11px;
+    border-radius: 8px;
+    font-weight: 500;
+    display: flex;
+    gap: 12px;
+    align-items: center
+}
+
+.sidebar nav button.active,
+.sidebar nav button:hover {
+    background: var(--purple2);
+    color: var(--purple)
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+    padding: 14px 8px 0;
+    border-top: 1px solid var(--line)
+}
+
+.sidebar-bottom small {
+    display: block;
+    font-size: 10px;
+    margin-bottom: 12px
+}
+
+.sidebar-bottom button {
+    background: transparent;
+    color: #626b76
+}
+
+.main {
+    flex: 1;
+    min-width: 0
+}
+
+.topbar {
+    height: 62px;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px
+}
+
+.crumb {
+    color: #a0a6af
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 12px
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #23aa78
+}
+
+.role-pill {
+    background: var(--purple2);
+    color: var(--purple);
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700
+}
+
+.user-area button {
+    background: transparent;
+    color: #8b929b
+}
+
+.content {
+    padding: 28px 32px;
+    max-width: 1500px;
+    margin: auto
+}
+
+.page-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px
+}
+
+.page-heading h1 {
+    font: 800 24px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    margin: 0 0 5px
+}
+
+.page-heading p {
+    margin: 0;
+    color: var(--muted)
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px
+}
+
+.metric,
+.panel,
+.table-wrap {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px
+}
+
+.metric {
+    padding: 18px
+}
+
+.metric .label {
+    color: var(--muted);
+    font-size: 12px
+}
+
+.metric .value {
+    font: 800 24px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    margin: 9px 0 4px
+}
+
+.metric .hint {
+    font-size: 11px;
+    color: var(--muted)
+}
+
+.panel {
+    padding: 19px;
+    margin-top: 16px
+}
+
+.panel h3 {
+    font: 700 15px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    margin: 0 0 14px
+}
+
+.table-wrap {
+    overflow: auto;
+    margin-top: 14px
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap
+}
+
+th {
+    text-align: left;
+    background: #fffdf6;
+    color: #7b8490;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px
+}
+
+td,
+th {
+    padding: 13px 15px;
+    border-bottom: 1px solid #eff1f4
+}
+
+td {
+    font-size: 12px
+}
+
+tr:last-child td {
+    border-bottom: 0
+}
+
+.badge {
+    display: inline-block;
+    border-radius: 20px;
+    padding: 5px 8px;
+    background: #f1f3f5;
+    color: #606975;
+    font-size: 10px;
+    font-weight: 700
+}
+
+.badge.done,
+.badge.confirmed,
+.badge.posted {
+    background: #e7f6ef;
+    color: #14845e
+}
+
+.badge.ready {
+    background: #e8f4fd;
+    color: #0b6bcb
+}
+
+.badge.pending {
+    background: #fff4df;
+    color: #a66a09
+}
+
+.badge.rejected,
+.badge.cancelled {
+    background: #fdecec;
+    color: #b83e3e
+}
+
+.toolbar {
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    flex-wrap: wrap
+}
+
+.toolbar input {
+    max-width: 240px
+}
+
+.btn {
+    border: 1px solid #e3dcc4;
+    background: #fff;
+    padding: 9px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600
+}
+
+.btn.primary {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: white
+}
+
+.notice {
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: #f0f8f4;
+    color: #16744f;
+    margin-bottom: 14px
+}
+
+.notice.error {
+    background: #fff1f1;
+    color: #b33d3d
+}
+
+.empty {
+    padding: 34px;
+    text-align: center;
+    color: var(--muted)
+}
+
+.split {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 15px
+}
+
+.list-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px
+}
+
+.form-grid label {
+    margin: 4px 0 6px
+}
+
+.form-grid .wide {
+    grid-column: 1/-1
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: #17192366;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    z-index: 10
+}
+
+.modal {
+    background: white;
+    border-radius: 14px;
+    width: min(650px, 96vw);
+    max-height: 90vh;
+    overflow: auto;
+    padding: 22px
+}
+
+.modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px
+}
+
+.modal-head h3 {
+    margin: 0;
+    font: 700 18px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px
+}
+
+.muted-cell {
+    color: var(--muted)
+}
+
+@media(max-width:1000px) {
+    .sidebar {
+        width: 205px
+    }
+
+    .grid {
+        grid-template-columns: repeat(2, 1fr)
+    }
+
+    .content {
+        padding: 22px
+    }
+}
+
+@media(max-width:700px) {
+    .sidebar {
+        width: 65px;
+        padding: 12px 7px
+    }
+
+    .brand div,
+    .company-switch,
+    .nav-label,
+    .sidebar nav button span,
+    .sidebar-bottom small,
+    .sidebar-bottom button {
+        display: none
+    }
+
+    .sidebar nav button {
+        justify-content: center;
+        font-size: 18px
+    }
+
+    .topbar {
+        padding: 0 14px
+    }
+
+    .content {
+        padding: 18px 13px
+    }
+
+    .grid,
+    .split {
+        grid-template-columns: 1fr
+    }
+
+    .page-heading {
+        align-items: flex-start;
+        gap: 12px;
+        flex-direction: column
+    }
+}
+/* ================= Tambahan UI ERP (app switcher, form, status bar, kanban, chatter) ================= */
+.crumbs { display: flex; align-items: center; gap: 12px }
+.apps-btn { background: var(--purple2); color: var(--purple); border-radius: 8px; padding: 8px 11px; font-weight: 700; font-size: 12px }
+.crumb a { color: #a0a6af; text-decoration: none; cursor: pointer }
+.crumb a:hover { color: var(--purple) }
+.crumb b { color: var(--ink) }
+.sidebar nav .group { font-size: 10px; letter-spacing: 1.2px; color: #a1a8b1; font-weight: 700; padding: 12px 11px 4px }
+.app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px }
+.app-tile { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 20px 16px; text-align: left; transition: .15s }
+.app-tile:hover { border-color: var(--purple); box-shadow: 0 8px 24px #2e7d4f1f; transform: translateY(-1px) }
+.app-tile .ic { width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center; font-size: 20px; color: #fff; margin-bottom: 12px }
+.app-tile b { display: block; font: 700 15px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif }
+.app-tile small { font-size: 11px }
+.app-tile.locked { opacity: .45; cursor: not-allowed }
+.section-title { font: 700 13px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; margin: 22px 0 10px; color: #59616d; letter-spacing: .3px }
+
+.list-toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 4px }
+.list-toolbar input, .list-toolbar select { width: auto; min-width: 150px; padding: 8px 10px; font-size: 12px }
+.view-toggle { display: inline-flex; border: 1px solid #e3dcc4; border-radius: 7px; overflow: hidden }
+.view-toggle button { background: #fff; padding: 8px 11px; font-size: 12px; border-right: 1px solid #e3dcc4 }
+.view-toggle button:last-child { border-right: 0 }
+.view-toggle button.on { background: var(--purple2); color: var(--purple); font-weight: 700 }
+tr.clickable { cursor: pointer }
+tr.clickable:hover td { background: #fffdf5 }
+td.num, th.num { text-align: right }
+.group-row td { background: #fbf7ea; font-weight: 700; color: #4b4560 }
+
+.kanban { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; margin-top: 14px }
+.kcol { min-width: 230px; flex: 1; background: #f4efdf; border-radius: 12px; padding: 10px }
+.kcol h4 { margin: 2px 4px 10px; font: 700 13px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; display: flex; justify-content: space-between }
+.kcard { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 11px; margin-bottom: 8px; cursor: pointer; font-size: 12px }
+.kcard:hover { border-color: var(--purple) }
+.kcard b { display: block; margin-bottom: 4px }
+.kcard .kact { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px }
+.kcard .kact button { font-size: 10px; padding: 5px 7px }
+
+.sheet { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 22px; margin-top: 12px }
+.form-head { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 16px }
+.form-head h2 { margin: 0; font: 800 22px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif }
+.form-head small { display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; font-size: 10px; font-weight: 700 }
+.statusbar { display: flex; border: 1px solid #e3dcc4; border-radius: 8px; overflow: hidden; flex-wrap: wrap }
+.statusbar span { padding: 8px 14px; font-size: 11px; font-weight: 700; color: #8b929b; background: #fff; border-right: 1px solid #ece6d2 }
+.statusbar span:last-child { border-right: 0 }
+.statusbar span.on { background: var(--purple); color: #fff }
+.statusbar span.done { color: var(--purple) }
+.action-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 10px 0 16px; border-bottom: 1px solid var(--line); margin-bottom: 16px }
+.action-bar .acts { display: flex; gap: 8px; flex-wrap: wrap }
+.smart { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px }
+.smart button { border: 1px solid #e3dcc4; background: #fff; border-radius: 8px; padding: 8px 11px; font-size: 11px; font-weight: 600; color: #4f5763 }
+.smart button:hover { border-color: var(--purple); color: var(--purple) }
+.smart button.locked { opacity: .5 }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; margin-bottom: 18px }
+.fields .f { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed #eceff3; font-size: 12px }
+.fields .f span:first-child { color: var(--muted); white-space: nowrap }
+.fields .f span:last-child { text-align: right; font-weight: 600 }
+.totals { margin-left: auto; width: min(380px, 100%); margin-top: 14px }
+.totals .t { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; border-bottom: 1px solid #f4efdf }
+.totals .t:last-child { font-weight: 800; font-size: 15px; border-bottom: 0 }
+.chatter { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px }
+.chatter h3 { font: 700 14px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; margin: 0 0 10px }
+.log { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid #f3f4f6; font-size: 12px }
+.log .av { width: 28px; height: 28px; border-radius: 50%; background: var(--purple2); color: var(--purple); display: grid; place-items: center; font-weight: 800; font-size: 11px; flex-shrink: 0 }
+.log.denied .av { background: #fdecec; color: var(--red) }
+.kpi { cursor: pointer; transition: .15s }
+.kpi:hover { border-color: var(--purple) }
+.kpi .drill { font-size: 10px; color: var(--purple); font-weight: 700; margin-top: 6px }
+.denied-page { text-align: center; padding: 60px 20px }
+.denied-page .big { font: 800 56px Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; color: var(--red); margin: 0 }
+.line-editor td { padding: 6px }
+.line-editor input, .line-editor select { padding: 7px 8px; font-size: 12px }
+.badge.quotation, .badge.rfq, .badge.draft, .badge.waiting, .badge.requested, .badge.new { background: #eef1f5; color: #4f5763 }
+.badge.pending-approval, .badge.quality-checked, .badge.mismatch, .badge.partial, .badge.proposition { background: #fff4df; color: #a66a09 }
+.badge.won, .badge.paid, .badge.matched, .badge.qualified { background: #e7f6ef; color: #14845e }
+.badge.lost, .badge.not-paid { background: #fdecec; color: #b83e3e }
+.hint-box { background: #fbf7ea; border: 1px solid #efe6c4; border-radius: 9px; padding: 10px 12px; font-size: 12px; color: #4b4560; margin: 8px 0 }
+.modal { width: min(820px, 96vw) }
+@media(max-width:700px) { .fields { grid-template-columns: 1fr } .apps-btn { padding: 7px } }
+
+/* ===== Dashboard per role & admin ===== */
+.dash-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px }
+.dash-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px }
+.dash-head h3 { margin: 0 }
+.dash-panel .table-wrap { max-height: 320px; margin-top: 6px }
+.bars { display: grid; gap: 8px; margin-top: 6px }
+.bar-row { display: grid; grid-template-columns: minmax(90px, 30%) 1fr auto; gap: 10px; align-items: center; font-size: 12px }
+.bar-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.bar-track { background: #f6f1df; border-radius: 6px; height: 12px; overflow: hidden }
+.bar-fill { display: block; height: 100%; background: var(--purple); border-radius: 6px }
+.bar-val { font-weight: 700; white-space: nowrap }
+.perm-table td { vertical-align: top; white-space: normal; min-width: 130px }
+.perm { display: flex; gap: 6px; align-items: flex-start; font-weight: 500; font-size: 11px; margin: 0 0 6px }
+.perm input { width: auto; margin-top: 2px }
+.smart button.on-role { background: var(--purple); color: #fff; border-color: var(--purple) }
+@media(max-width:1000px) { .dash-grid { grid-template-columns: 1fr } }
+
+/* ===== Sidebar & topbar tetap (logout tidak ikut scroll) ===== */
+.sidebar { position: sticky; top: 0; height: 100vh; overflow-y: auto; align-self: flex-start }
+.sidebar-bottom { position: sticky; bottom: 0; background: #fff; padding-bottom: 6px }
+.topbar { position: sticky; top: 0; z-index: 5 }
+.perm-diff { color: var(--purple); font-weight: 700 }
+
+/* Grafik KPI dashboard */
+.chart { width: 100%; height: auto; display: block; margin-top: 6px }
+.ch-grid { stroke: var(--line); stroke-width: 1 }
+.ch-axis { font-size: 10px; fill: var(--muted) }
+.chart rect:hover { opacity: .8 }
+.ch-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 11px; color: var(--muted); margin-top: 6px }
+.ch-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px }
+.dv { display: grid; gap: 8px; margin-top: 6px }
+.dv-row { display: grid; grid-template-columns: minmax(90px, 32%) 1fr 118px; gap: 10px; align-items: center; font-size: 12px }
+.dv-track { position: relative; height: 14px; background: #fbf8ee; border-radius: 6px }
+.dv-fill { position: absolute; top: 0; height: 100% }
+.dv-fill.pos { background: var(--green); border-radius: 0 6px 6px 0 }
+.dv-fill.neg { background: var(--red); border-radius: 6px 0 0 6px }
+.dv-axis { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--muted) }
+.txt-green { color: var(--green) } .txt-red { color: var(--red) }
+
+/* Owner Executive Dashboard */
+.ex { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px }
+.ex-panel { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; margin-bottom: 18px }
+.ex > .ex-panel, .ex-2col .ex-panel:last-child { margin-bottom: 0 }
+.ex-panel.slim { padding: 18px 22px }
+.ex-title { display: flex; align-items: center; gap: 8px; margin: 0 0 16px; font-family: Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 15px; letter-spacing: .2px }
+.ex-ic { font-size: 14px }
+.ex-grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px }
+.ex-grid4:last-child { margin-bottom: 0 }
+.ex-grid6 { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px }
+.ex-card { border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; background: #fffdf6; min-height: 96px }
+.ex-card.kpi { cursor: pointer } .ex-card.kpi:hover { border-color: var(--purple) }
+.ex-card.accent { background: #fff8dc; border-color: #e8b923 }
+.ex-card.good { background: #eefaf4; border-color: #bfe8d4 } .ex-card.good .ex-val { color: var(--green) }
+.ex-card.bad { background: #fdf0f0; border-color: #f0c4c4 } .ex-card.bad .ex-val { color: var(--red) }
+.ex-val { font-family: Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.ex-lab { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #5d6670 }
+.ex-hint { font-size: 12px; color: var(--muted) }
+.ex-alert { border-radius: 10px; padding: 14px 18px; font-size: 14px }
+.ex-alert.ok { background: #eefaf4; border: 1px solid #9fd9bc; color: #0f7a55; font-weight: 600 }
+.ex-alert.warn { background: #fff7e6; border: 1px solid #f1c776; color: #8a5a00 }
+.ex-appr { display: grid; gap: 6px; margin-top: 10px }
+.ex-appr-row { display: grid; grid-template-columns: auto auto 1fr 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; color: inherit; text-decoration: none; font-size: 13px }
+.ex-appr-row:hover { border-color: var(--purple) }
+.ex-2col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start }
+.ex-2col.charts .ex-panel { margin: 0 }
+.ex-pnl { display: grid; gap: 4px }
+.ex-pnl-row { display: flex; justify-content: space-between; padding: 9px 14px; border-radius: 8px; font-size: 14px }
+.ex-pnl-row:nth-child(even) { background: #fffdf6 }
+.ex-pnl-row.strong { background: #fff5cc; border: 1px solid #f2df98; font-weight: 700 }
+.ex-banner { margin-top: 14px; border-radius: 10px; padding: 12px; text-align: center; font-family: Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-weight: 700 }
+.ex-banner.impas { background: #fdf3b5; color: #6b5a00 } .ex-banner.untung { background: #dff5ea; color: #0f7a55 } .ex-banner.rugi { background: #fbe1e1; color: #a33 }
+.ex-dept { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+.ex-dept-card { border: 1px solid var(--line); border-radius: 10px; padding: 14px 8px; text-align: center; background: #fffdf6; cursor: help }
+.ex-dept-name { font-family: Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 1px }
+.ex-dept-val { font-family: Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-weight: 700; font-size: 17px; color: var(--purple); margin: 6px 0 4px }
+.ex-dept-st { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #5d6670 }
+.ex-dept-card.untung { background: #eefaf4; border-color: #bfe8d4 } .ex-dept-card.untung .ex-dept-val { color: var(--green) }
+.ex-dept-card.rugi { background: #fdf0f0; border-color: #f0c4c4 } .ex-dept-card.rugi .ex-dept-val { color: var(--red) }
+.ex-foot { margin-top: 12px; font-size: 12px; color: var(--muted) } .ex-foot a { cursor: pointer; color: var(--purple); font-weight: 600 }
+.ex-empty { text-align: center; color: var(--muted); padding: 34px 0 }
+.ex-top { display: grid; gap: 10px }
+.ex-top-row { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 13px }
+.ex-rank { width: 24px; height: 24px; border-radius: 50%; background: var(--purple2); color: var(--purple); font-weight: 700; display: grid; place-items: center; font-size: 12px }
+.ex-top-main b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600 }
+.ex-top-track { display: block; height: 6px; background: #f4efdf; border-radius: 4px; margin-top: 4px; overflow: hidden }
+.ex-top-track span { display: block; height: 100% } .ex-top-track .pos { background: var(--green) } .ex-top-track .neg { background: var(--red) }
+.ex-top-val { text-align: right; font-weight: 700; white-space: nowrap } .ex-top-val small { display: block; font-weight: 400; color: var(--muted); font-size: 11px }
+.ex-section { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; color: var(--muted); margin-top: 4px }
+@media(max-width:1100px) { .ex-grid6 { grid-template-columns: repeat(3, minmax(0, 1fr)) } }
+@media(max-width:900px) { .ex-grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)) } .ex-2col { grid-template-columns: minmax(0, 1fr) } .ex-appr-row { grid-template-columns: 1fr 1fr } }
+@media(max-width:520px) { .ex-grid6, .ex-dept { grid-template-columns: repeat(2, minmax(0, 1fr)) } .ex-panel { padding: 16px } }
+.main { min-width: 0 }
+@media(max-width:700px) {
+    .content { padding: 14px }
+    .topbar { flex-wrap: wrap; gap: 6px }
+    .user-area .muted, .user-area .status-dot { display: none }
+    .page-heading { flex-wrap: wrap; gap: 10px }
+}
+@media(max-width:520px) { .ex-grid4 { grid-template-columns: 1fr } .ex-val { font-size: 20px } }
+
+h1, h2, h3, h4, button, input, select, textarea { font-family: Manrope, 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif }
+button, input, select, textarea { font-family: inherit }
+
+
+/* ================= Tema Segar Rasa ================= */
+body { background: var(--bg) }
+.primary { background: var(--purple); box-shadow: 0 2px 0 #1f5c39 }
+.primary:hover { background: #276b43 }
+.btn { background: #fff; border: 1px solid var(--line) }
+.eyebrow { color: var(--lemon-ink) }
+
+/* Login dua kolom */
+.login-shell { min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; background: var(--bg); place-items: stretch }
+.login-hero { position: relative; overflow: hidden; padding: 56px 60px; display: flex; flex-direction: column; justify-content: space-between; color: #1e2b22;
+  background: radial-gradient(circle at 85% 15%, #fff3b0 0, transparent 40%), linear-gradient(150deg, #ffe066 0%, #f4c430 45%, #9ccb3b 100%) }
+.login-hero .hero-brand { display: flex; align-items: center; gap: 12px; font: 800 20px Manrope, 'DM Sans', system-ui, sans-serif }
+.login-hero h2 { font: 800 52px/1.05 Manrope, 'DM Sans', system-ui, sans-serif; margin: 0 0 16px; max-width: 520px; color: #17311f }
+.login-hero p { font-size: 17px; line-height: 1.5; max-width: 470px; margin: 0; color: #2b3a24 }
+.hero-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px }
+.hero-chips span { background: #fffbeacc; border: 1px solid #ffffff; color: #2b3a24; padding: 7px 12px; border-radius: 999px; font-weight: 600; font-size: 12px }
+.hero-lemon { position: absolute; right: -110px; bottom: -130px; width: 420px; height: 420px; opacity: .95; pointer-events: none }
+.hero-leaf { position: absolute; right: 250px; top: 70px; width: 90px; opacity: .85; pointer-events: none }
+.hero-foot { font-size: 12px; color: #2b3a24; position: relative }
+.login-side { display: grid; place-items: center; padding: 40px 24px }
+.login-card { border-color: var(--line); box-shadow: 0 18px 60px #6b530014 }
+.login-card h1 { color: #17311f }
+.brand-mark { background: var(--lemon); color: #17311f; box-shadow: inset 0 -3px 0 #e0ad12 }
+.brand-mark.small { background: var(--lemon); color: #17311f }
+.login-card .primary { padding: 13px }
+.pw-wrap { position: relative }
+.pw-wrap button { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; color: var(--muted); font-size: 12px; font-weight: 600; padding: 6px }
+.login-note { display: block; margin-top: 6px; font-size: 12px; color: var(--muted) }
+@media(max-width: 860px) { .login-shell { grid-template-columns: 1fr } .login-hero { padding: 36px 26px; min-height: 260px } .login-hero h2 { font-size: 34px } .hero-lemon { width: 220px; height: 220px; right: -80px; top: -80px; bottom: auto; opacity: .45 } .hero-leaf, .hero-chips, .hero-foot { display: none } .login-hero > div:nth-child(4) { margin-top: 18px } }
+
+/* Sidebar & topbar */
+.sidebar { background: #fffef9 }
+.company-switch { background: var(--lemon2); border-color: #f2df98; color: #3d3410 }
+.company-switch span { color: var(--lemon-ink) }
+.sidebar nav button.active { background: var(--lemon2); color: #17311f; font-weight: 700; box-shadow: inset 3px 0 0 var(--lemon) }
+.sidebar nav button:hover { background: var(--purple2); color: var(--purple) }
+.sidebar-bottom small { color: var(--muted) }
+.topbar { box-shadow: inset 0 3px 0 var(--lemon) }
+.role-pill { background: var(--lemon2); color: var(--lemon-ink) }
+.apps-btn { background: var(--lemon2); color: #3d3410 }
+.page-heading h1 { position: relative }
+.app-tile .ic { box-shadow: inset 0 -3px 0 #0000001f }
+
+/* ================= Animasi, 3D & polesan UI ================= */
+:root { --slice: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='99' fill='%23f2b705'/%3E%3Ccircle cx='100' cy='100' r='90' fill='%23fff6c2'/%3E%3Ccircle cx='100' cy='100' r='82' fill='%23ffe14d'/%3E%3Cg fill='%23fff3a0' stroke='%23fff8d6' stroke-width='4'%3E%3Cpath d='M100 100L100 24A76 76 0 0 1 153.7 46.3Z'/%3E%3Cpath d='M100 100L153.7 46.3A76 76 0 0 1 176 100Z'/%3E%3Cpath d='M100 100L176 100A76 76 0 0 1 153.7 153.7Z'/%3E%3Cpath d='M100 100L153.7 153.7A76 76 0 0 1 100 176Z'/%3E%3Cpath d='M100 100L100 176A76 76 0 0 1 46.3 153.7Z'/%3E%3Cpath d='M100 100L46.3 153.7A76 76 0 0 1 24 100Z'/%3E%3Cpath d='M100 100L24 100A76 76 0 0 1 46.3 46.3Z'/%3E%3Cpath d='M100 100L46.3 46.3A76 76 0 0 1 100 24Z'/%3E%3C/g%3E%3Ccircle cx='100' cy='100' r='9' fill='%23fff8d6'/%3E%3Cellipse cx='72' cy='62' rx='26' ry='12' fill='%23ffffff' opacity='.45' transform='rotate(-35 72 62)'/%3E%3C/svg%3E") }
+
+/* Lemon 3D */
+.lemon3d { --ls: 120px; width: var(--ls); height: var(--ls); perspective: 900px; animation: fx-float 6s ease-in-out infinite; pointer-events: none }
+.lemon-spin { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; animation: fx-spin 16s linear infinite }
+.lemon-spin i { position: absolute; inset: 0; border-radius: 50% }
+.lemon-spin .rind { background: radial-gradient(circle at 35% 30%, #ffe680, #e2a90c 72%) }
+.lemon-spin .face { background: var(--slice) center / 100% 100% no-repeat }
+.lemon-spin .front { transform: translateZ(.8px) }
+@keyframes fx-spin { from { transform: rotateX(16deg) rotateY(0deg) } to { transform: rotateX(16deg) rotateY(360deg) } }
+@keyframes fx-float { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-14px) } }
+
+/* Panggung login */
+.hero-stage { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .25s ease-out; pointer-events: none }
+.hero-stage .big { position: absolute; right: -60px; bottom: -50px }
+.hero-stage .mid { position: absolute; right: 270px; top: 110px; animation-delay: -2s }
+.hero-stage .mid .lemon-spin { animation-duration: 11s; animation-direction: reverse }
+.hero-stage .tiny { position: absolute; right: 110px; top: 54px; animation-delay: -4s }
+.hero-stage .tiny .lemon-spin { animation-duration: 8s }
+.drop { position: absolute; bottom: -20px; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #fff8 60%, transparent 70%); border: 1px solid #ffffffaa; animation: fx-bubble 7s linear infinite }
+.drop.d1 { left: 18% } .drop.d2 { left: 46%; width: 9px; height: 9px; animation-delay: -2.5s; animation-duration: 6s } .drop.d3 { left: 70%; width: 18px; height: 18px; animation-delay: -4.5s; animation-duration: 9s }
+@keyframes fx-bubble { 0% { transform: translateY(0); opacity: 0 } 10% { opacity: .9 } 100% { transform: translateY(-110vh) translateX(18px); opacity: 0 } }
+.leaf-float { animation: fx-leaf 7s ease-in-out infinite; transform-origin: 10% 90% }
+@keyframes fx-leaf { 0%, 100% { transform: rotate(-6deg) translateY(0) } 50% { transform: rotate(8deg) translateY(-10px) } }
+.login-hero > div:not(.hero-stage), .login-hero h2, .login-hero p { position: relative }
+.login-hero h2 { animation: fx-rise .8s .1s cubic-bezier(.2, .8, .2, 1) backwards }
+.login-hero p, .hero-chips { animation: fx-rise .8s .25s cubic-bezier(.2, .8, .2, 1) backwards }
+.login-card { animation: fx-rise .8s .2s cubic-bezier(.2, .8, .2, 1) backwards }
+@media(max-width: 860px) { .hero-stage .big { right: -90px; bottom: auto; top: -90px; opacity: .55 } .hero-stage .mid, .hero-stage .tiny { display: none } }
+
+/* Banner sapaan */
+.welcome { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 26px 30px; margin-bottom: 18px; border-radius: 20px;
+  background: radial-gradient(circle at 92% 30%, #fff7c7 0, transparent 35%), linear-gradient(120deg, #fff4c4 0%, #f7f2dc 45%, #e6f3e2 100%); border: 1px solid #f0e3b0 }
+.welcome h2 { margin: 2px 0 6px; font: 800 30px/1.1 Manrope, 'DM Sans', system-ui, sans-serif; color: #17311f }
+.welcome p { margin: 0; color: #3d4a33; max-width: 560px }
+.welcome .eyebrow { margin: 0; text-transform: capitalize; letter-spacing: .5px; font-weight: 700; font-size: 12px }
+.welcome-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px }
+.welcome-tags span { background: #ffffffb3; border: 1px solid #fff; padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #2b3a24 }
+.welcome-art { position: relative; width: 210px; height: 150px; flex-shrink: 0 }
+.welcome-art .lemon3d { position: absolute; right: 10px; top: 0 }
+.welcome-art .mini { right: 150px; top: 70px; animation-delay: -3s }
+.welcome-art .mini .lemon-spin { animation-duration: 9s; animation-direction: reverse }
+@media(max-width: 700px) { .welcome { padding: 20px } .welcome h2 { font-size: 24px } .welcome-art { position: absolute; right: -40px; top: -20px; opacity: .35 } }
+
+/* Reveal saat scroll: naik + fade bertahap */
+.fx-reveal { opacity: 0 }
+.fx-reveal.fx-in { opacity: 1; animation: fx-rise .75s var(--fx-d, 0ms) cubic-bezier(.2, .8, .2, 1) backwards }
+@keyframes fx-rise { from { opacity: 0; transform: translateY(28px) scale(.985) } to { opacity: 1; transform: none } }
+.fx-head h1, .fx-head p { animation: fx-rise .5s cubic-bezier(.2, .8, .2, 1) backwards }
+.fx-head p { animation-delay: .08s }
+
+/* Grafik tumbuh */
+.fx-in .chart rect { transform-box: fill-box; transform-origin: 50% 100%; animation: fx-grow-y .9s calc(var(--ri, 0) * 35ms + 150ms) cubic-bezier(.2, .8, .2, 1) backwards }
+.fx-in .bar-fill, .fx-in .ex-top-track span, .fx-in .dv-fill.pos { transform-origin: left center; animation: fx-grow-x .9s calc(var(--ri, 0) * 60ms + 120ms) cubic-bezier(.2, .8, .2, 1) backwards }
+.fx-in .dv-fill.neg { transform-origin: right center; animation: fx-grow-x .9s calc(var(--ri, 0) * 60ms + 120ms) cubic-bezier(.2, .8, .2, 1) backwards }
+@keyframes fx-grow-y { from { transform: scaleY(0) } }
+@keyframes fx-grow-x { from { transform: scaleX(0) } }
+
+/* Tilt 3D + kilau */
+.fx-tilt { position: relative; transition: transform .18s ease-out, box-shadow .25s ease; will-change: transform; transform-style: preserve-3d }
+.fx-tilt::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .25s;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), #ffffff8c, transparent 55%) }
+.fx-tilt:hover { box-shadow: 0 18px 40px #6b530021 }
+.fx-tilt:hover::after { opacity: 1 }
+.app-tile .ic { transition: transform .25s ease } .app-tile:hover .ic { transform: translateZ(20px) scale(1.08) rotate(-4deg) }
+
+/* Polesan umum */
+.avatar { width: 30px; height: 30px; border-radius: 50%; display: inline-grid; place-items: center; background: var(--lemon); color: #17311f; font: 800 12px Manrope, 'DM Sans', sans-serif; box-shadow: inset 0 -2px 0 #e0ad12 }
+.panel, .metric, .sheet, .dash-panel { border-radius: 16px; box-shadow: 0 1px 0 #fff inset, 0 8px 24px #6b53000a }
+.ex-panel { box-shadow: 0 8px 28px #6b53000d }
+.btn, .primary { transition: transform .12s ease, box-shadow .2s ease, background .2s }
+.btn:active, .primary:active { transform: translateY(1px) scale(.98) }
+.sidebar nav button { transition: background .2s, color .2s, padding-left .2s }
+.sidebar nav button:hover { padding-left: 16px }
+.modal { animation: fx-pop .28s cubic-bezier(.2, .9, .3, 1.2) }
+@keyframes fx-pop { from { opacity: 0; transform: translateY(16px) scale(.96) } }
+.notice { animation: fx-rise .45s cubic-bezier(.2, .8, .2, 1) }
+::selection { background: var(--lemon2) }
+
+@media (prefers-reduced-motion: reduce) {
+  .lemon3d, .lemon-spin, .drop, .leaf-float, .login-card, .login-hero h2, .login-hero p, .hero-chips, .modal, .notice { animation: none !important }
+  .fx-reveal { opacity: 1 }
+}
