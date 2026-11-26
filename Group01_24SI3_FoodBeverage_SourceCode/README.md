@@ -87,8 +87,8 @@ Login sebagai Master Admin → **Home → ↺ Reset baseline seed**. Seluruh tra
 ---
 
 ## Akun dan role
-
-Akun uji tidak ditulis di repository maupun halaman login. Daftar akun dikirim terpisah kepada dosen; file lokal `AKUN_UJI_RAHASIA.txt` dikecualikan dari repository lewat `.gitignore`.
+Username: role contoh owner / sales.staff / sales = manager
+Pass : role123 contoh owner123 / sales.staff123 / sales123
 
 Tersedia 12 akun dalam 7 role. Lima role bisnis memiliki level Manager dan Staff.
 
@@ -176,24 +176,3 @@ Aplikasi berjalan di **https://valentinor.pythonanywhere.com** dengan HTTPS. Sem
 Pembaruan kode cukup dengan mengunggah file yang berubah lalu klik **Reload**. Folder `instance/` di server berisi database produksi dan tidak boleh ditimpa.
 
 **Backup dan restore:** Master Admin → Home → **⤓ Backup database** mengunduh salinan lengkap. **⤒ Restore database** memvalidasi file (header SQLite, integrity check, tabel wajib, minimal satu Admin aktif) sebelum menggantikan database, dan tindakan ini tercatat di audit log.
-
----
-
-## Riwayat pengalihan peran
-
-Sesuai ketentuan handout, setiap pengalihan peran dicatat di sini.
-
-| Tanggal | Anggota | Dari | Menjadi | Alasan |
-|---|---|---|---|---|
-| — | — | — | — | Belum ada pengalihan peran |
-
----
-
-## Keterbatasan yang diketahui
-
-Rincian dan statusnya ada di bagian Defect Log pada [Test Results](docs/Group01_24SI3_FoodBeverage_TestResults.md).
-
-- Pembayaran terhadap saldo awal AR/AP (opening balance) belum dimodelkan; pembayaran hanya untuk invoice/bill yang diposting di aplikasi.
-- Belum ada fitur pencatatan biaya operasional, sehingga Warehouse dan Finance pada Profit per Departemen selalu Rp0.
-- Belum ada stock opname/penyesuaian stok, peringatan lead ganda, POS, proteksi CSRF, dan pembatasan percobaan login.
-- SQLite cocok untuk skala demo; untuk banyak pengguna bersamaan disarankan migrasi ke PostgreSQL.
