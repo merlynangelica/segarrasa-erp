@@ -1,21 +1,6 @@
 # Test Results T-01–T-36 — SegarRasa ERP
 
-**Group 01 · 24SI3 · Food & Beverage** · Penanggung jawab (A/R): M4 QA dan Deployment Lead — Edward Narto
-
-## Ringkasan
-
-| | |
-|---|---|
-| Kode yang diuji | Versi yang di-deploy di https://valentinor.pythonanywhere.com (isi repository ini) |
-| Tanggal eksekusi uji otomatis | 26/11/2026 |
-| Lingkungan | Python 3.13, Flask 3.1, SQLite; setiap test memakai database baru dari baseline seed |
-| Perintah | `python -m pytest -v tests/` |
-| Hasil uji otomatis | **53 dari 53 PASS** (36 skenario T-01–T-36 + 1 skenario tambahan T-31b + 16 uji pendukung) |
-| Hasil T-01–T-36 | **36 PASS · 0 FAIL** |
-
-Kolom **Actual** di bawah adalah nilai yang benar-benar diperiksa (assert) oleh uji otomatis pada kode di repository ini, bukan perkiraan. Uji otomatis membuktikan logika di level API/database. Bukti UI (screenshot dari aplikasi publik setelah reset baseline) disimpan di folder `bukti/` dengan nama `T-xx.png`; status pengumpulannya ada di bagian **Checklist bukti UI**.
-
-Prosedur setiap uji UI: login Master Admin → Home → **↺ Reset baseline seed** → jalankan situasi T-xx dengan akun role terkait → bandingkan dengan expected → simpan screenshot.
+**Group 01 · 24SI3 · Food & Beverage** 
 
 ## Hasil T-01–T-36
 
@@ -60,27 +45,6 @@ Prosedur setiap uji UI: login Master Admin → Home → **↺ Reset baseline see
 
 Kolom **Tester** mengikuti pembagian tanggung jawab uji pada handout (M1–M4). Rincian peran ada di [Role Assignment Sheet](Group01_24SI3_FoodBeverage_RoleAssignmentSheet.md).
 
-## Uji tambahan (di luar T-01–T-36)
-
-| Test | Yang dibuktikan | Status |
-|---|---|---|
-| `test_T31b_return_stage_order_and_roles` | Retur tidak bisa melompati tahap; Sales tidak bisa menginspeksi; retur Damaged tidak menambah stok dan masuk Quality Loss Rp9.000 | PASS |
-| `test_trial_balance_always_balanced` | Trial balance: selisih debit − kredit = 0 setelah delivery dan posting invoice | PASS |
-| `test_admin_user_lifecycle` | Master Admin membuat user dan menonaktifkannya; sesi aktif langsung berakhir, login ditolak, tercatat di Login History | PASS |
-| `test_admin_permission_change_applies` | Perubahan izin role (Sales diberi `purchase.view`) langsung berlaku dan tercatat di Permission Changes | PASS |
-| `test_admin_is_not_business_actor` | Master Admin ditolak saat membuka dokumen penjualan dan saat menyetujui PO | PASS |
-| `test_access_matrix_samples` | Owner tidak bisa membuat SO; Quality tidak bisa melihat invoice; Warehouse tidak bisa melihat lead; Sales tidak bisa mengubah credit limit; Finance bisa (SR-16) | PASS |
-| `test_role_dashboards_render` | Dashboard setiap role dapat dibuka dan menampilkan 4 KPI | PASS |
-| `test_lot_expiry_fefo` | Lot dan expiry tercatat saat receipt (LOT-A, 12 unit); delivery 5 unit mengurangi sisa lot menjadi 7 (F-23) | PASS |
-| `test_sales_cannot_create_delivery` | Delivery hanya dibuat Warehouse | PASS |
-| `test_discount_goes_straight_to_owner_approvals` | Quotation diskon > 10% langsung masuk daftar approval Owner; setelah Owner menolak, daftar approval kosong | PASS |
-| `test_staff_sees_only_own_documents` | Level Staff hanya melihat dokumen miliknya | PASS |
-| `test_admin_per_user_permission` | Grant izin per user berlaku untuk user itu saja; user lain dengan role sama tidak ikut berubah | PASS |
-| `test_owner_profit_breakdown` | Laporan untung/rugi per produk: net sales Rp90.000, COGS Rp54.000, laba kotor Rp36.000, status Untung | PASS |
-| `test_owner_executive_dashboard` | Executive Dashboard menampilkan KPI, enam kartu departemen, dan top produk; Sales ditolak (403) | PASS |
-| `test_procurement_creates_product` | Procurement dapat membuat variant SKU; Sales ditolak | PASS |
-| `test_backup_and_restore_database` | Backup menghasilkan file SQLite valid; restore memvalidasi file dan memulihkan data | PASS |
-| `test_print_invoice_page` | Halaman cetak invoice dapat dibuka Finance; Warehouse ditolak | PASS |
 
 ## Defect log
 
@@ -99,46 +63,6 @@ Defect yang ditemukan selama pengembangan dan pengujian. Beberapa adalah contoh 
 | DF-09 | Admin | Kolom "Reset password (opsional)" di form Edit User dapat terisi otomatis oleh browser; menyimpan form tanpa sengaja mengganti password akun yang diedit | Akun (termasuk admin) bisa tidak bisa login | Terbuka (pemulihan: reset password lewat console server) |
 | DF-10 | UI | Pada layar HP, sidebar menyempit dan hanya menampilkan titik menu | Navigasi di HP sulit | Terbuka |
 
-## Checklist bukti UI
-
-| T | Bukti wajib (handout) | File | Sudah dikumpulkan |
-|---|---|---|---|
-| T-01 | Capture App Switcher dua role + hasil otorisasi. | `bukti/T-01.png` | ☐ |
-| T-02 | Rekaman 403/denied tanpa isi ledger. | `bukti/T-02.png` | ☐ |
-| T-03 | Form kontak dan rincian perhitungan. | `bukti/T-03.png` | ☐ |
-| T-04 | Tangkapan validator kredit, SO belum Confirmed. | `bukti/T-04.png` | ☐ |
-| T-05 | List 15 baris dan dua Form produk. | `bukti/T-05.png` | ☐ |
-| T-06 | Bukti validasi SKU unik dan master tidak berubah. | `bukti/T-06.png` | ☐ |
-| T-07 | Kanban before-after dan link CRM00009. | `bukti/T-07.png` | ☐ |
-| T-08 | Bukti Quotation terkait, tanpa jurnal penjualan. | `bukti/T-08.png` | ☐ |
-| T-09 | Form SO status dan detail subtotal/tax. | `bukti/T-09.png` | ☐ |
-| T-10 | Bukti approval gate dan lock histori. | `bukti/T-10.png` | ☐ |
-| T-11 | Snapshot stock sebelum dan setelah reservasi. | `bukti/T-11.png` | ☐ |
-| T-12 | Bukti pencegahan oversell dan stock lain tidak berkurang. | `bukti/T-12.png` | ☐ |
-| T-13 | DO, backorder, stock move, jurnal COGS. | `bukti/T-13.png` | ☐ |
-| T-14 | Bukti nilai invoice cap dan backorder yang tersisa. | `bukti/T-14.png` | ☐ |
-| T-15 | Invoice, GL AR/revenue/PPN dan related delivery. | `bukti/T-15.png` | ☐ |
-| T-16 | Bukti invoicable qty nol, tanpa piutang/jurnal. | `bukti/T-16.png` | ☐ |
-| T-17 | PO lines/status; bukti belum ada Receipt posting. | `bukti/T-17.png` | ☐ |
-| T-18 | Bukti approval dan audit pencobaan. | `bukti/T-18.png` | ☐ |
-| T-19 | Receipt, QC status dan jurnal stok. | `bukti/T-19.png` | ☐ |
-| T-20 | Validasi penolakan/permintaan revisi PO. | `bukti/T-20.png` | ☐ |
-| T-21 | QC record dengan jumlah, alasan, actor. | `bukti/T-21.png` | ☐ |
-| T-22 | Bukti transisi diblokir dan jejak koreksi QC. | `bukti/T-22.png` | ☐ |
-| T-23 | Bill, match, ledger dan status GRNI. | `bukti/T-23.png` | ☐ |
-| T-24 | Screenshot selisih 2 unit dan posting ditahan. | `bukti/T-24.png` | ☐ |
-| T-25 | Journal, valuation report, DO reference. | `bukti/T-25.png` | ☐ |
-| T-26 | Bukti hanya satu journal, satu stock move dan satu pengurangan stock. | `bukti/T-26.png` | ☐ |
-| T-27 | Payment record, invoice residual, bank/AR ledger. | `bukti/T-27.png` | ☐ |
-| T-28 | Bukti dua request ditolak dan GL tidak berubah. | `bukti/T-28.png` | ☐ |
-| T-29 | Transfer, source/destination stock, valuation. | `bukti/T-29.png` | ☐ |
-| T-30 | Bukti saldo tetap hanya bergeser 5, bukan 10. | `bukti/T-30.png` | ☐ |
-| T-31 | Return, Credit Note, GL, inventory trace. | `bukti/T-31.png` | ☐ |
-| T-32 | Bukti batas return dan idempotency kredit. | `bukti/T-32.png` | ☐ |
-| T-33 | Screenshot KPI dan filter dokumen asal. | `bukti/T-33.png` | ☐ |
-| T-34 | Bukti pengecualian nilai SO dari posted revenue. | `bukti/T-34.png` | ☐ |
-| T-35 | Screenshot log, smart links, actor, timestamp. | `bukti/T-35.png` | ☐ |
-| T-36 | Bukti 1 invoice, 1 event Post, 1 journal dan AR tidak dobel. | `bukti/T-36.png` | ☐ |
 
 ## Cara mengulang uji
 
