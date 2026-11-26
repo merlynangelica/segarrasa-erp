@@ -85,11 +85,3 @@ Simpan screenshot di folder ini sesuai kolom **Bukti** pada [Test Results](../do
 | T-21 | `warehouse` | Buka receipt yang sudah Done, lihat bagian total. | QC00001; Inspected 12, Accepted 10, Rejected 2; accepted value Rp150.000; rejected value potensial Rp30.000. |
 | T-24 | `finance` | Buka receipt → **＋ Create Vendor Bill**, ubah **Qty ditagih vendor** menjadi **12** → Create Bill → coba **Post**. Cek Trial Balance. | (a) Status **Mismatch**. (b) Pesan posting ditahan. (c) AP (2100) tetap Rp220.000. |
 | T-23 | `finance` | Di bill yang sama klik **Resolve: tagih sebatas accepted** → **Post**. Cek Trial Balance. | (a) Bill net Rp150.000, PPN Rp16.500, total Rp166.500, Posted. (b) AP Rp386.500, GRNI (1210) Rp0. |
-
----
-
-## Setelah semua sesi selesai
-
-1. Centang setiap T di **Checklist bukti UI** pada Test Results.
-2. Bila ada hasil yang berbeda dari expected, ubah kolom Status menjadi **FAIL**, tulis actual yang sebenarnya, dan catat di Defect Log.
-3. Kembalikan data online sesuai kebutuhan presentasi: Reset baseline, atau Restore dari backup.
